@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>URL Metadata Extractor</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+  <main>
+    <header>
+      <h1>URL Metadata Extractor</h1>
+      <p>Paste a link to see its title, description, social preview data, and more.</p>
+    </header>
+
+    <form method="post">
+      <label for="url">Page URL</label>
+      <div class="field">
+        <input type="text" id="url" name="url" value="{{ url_input }}" placeholder="https://example.com" autofocus
+          required>
+        <button type="submit">Extract metadata</button>
+      </div>
+    </form>
+
+    {% if error %}
+    <p class="error" role="alert">{{ error }}</p>
+    {% endif %}
+
+    {% if metadata %}
+    <section class="results">
+      {% if metadata.notice %}
+      <p class="notice">{{ metadata.notice }}</p>
+      {% endif %}
+      <div class="summary">
+        {% if metadata.favicon %}
+        <img class="favicon" src="{{ metadata.favicon }}" alt="" width="32" height="32">
+        {% endif %}
+        <div>
+          <h2>{{ metadata.title or "No title found" }}</h2>
+          <a href="{{ metadata.url }}" target="_blank" rel="noopener">{{ metadata.url }}</a>
+        </div>
+      </div>
+
+      <dl>
+        <dt>Description</dt>
+        <dd>{{ metadata.description or "Not provided" }}</dd>
+
+        <dt>Domain</dt>
+        <dd>{{ metadata.domain }}</dd>
+
+        <dt>Language</dt>
+        <dd>{{ metadata.language or "Not provided" }}</dd>
+
+        <dt>Author</dt>
+        <dd>{{ metadata.author or "Not provided" }}</dd>
+
+        <dt>Keywords</dt>
+        <dd>{{ metadata.keywords or "Not provided" }}</dd>
+
+        <dt>Links on page</dt>
+        <dd>{{ metadata.links.total }} total ({{ metadata.links.internal }} internal, {{ metadata.links.external }}
+          external)</dd>
+      </dl>
+
+      <h3>Social preview (Open Graph)</h3>
+      {% if metadata.open_graph %}
+      {% if metadata.open_graph.get("og:image") %}
+      <img class="og-image" src="{{ metadata.open_graph['og:image'] }}" alt="Open Graph preview image">
+      {% endif %}
+      <dl>
+        {% for key, value in metadata.open_graph.items() %}
+        <dt>{{ key }}</dt>
+        <dd>{{ value }}</dd>
+        {% endfor %}
+      </dl>
+      {% else %}
+      <p class="muted">This page has no Open Graph tags.</p>
+      {% endif %}
+
+      <h3>Twitter card</h3>
+      {% if metadata.twitter %}
+      <dl>
+        {% for key, value in metadata.twitter.items() %}
+        <dt>{{ key }}</dt>
+        <dd>{{ value }}</dd>
+        {% endfor %}
+      </dl>
+      {% else %}
+      <p class="muted">This page has no Twitter card tags.</p>
+      {% endif %}
+
+      <h3>Headings</h3>
+      {% if metadata.headings.h1 or metadata.headings.h2 %}
+      <ul>
+        {% for text in metadata.headings.h1 %}<li><strong>H1</strong> {{ text }}</li>{% endfor %}
+        {% for text in metadata.headings.h2 %}<li><strong>H2</strong> {{ text }}</li>{% endfor %}
+      </ul>
+      {% else %}
+      <p class="muted">No H1 or H2 headings found.</p>
+      {% endif %}
+    </section>
+    {% endif %}
+  </main>
+</body>
+
+</html>
