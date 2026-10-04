@@ -118,9 +118,8 @@ def health():
 
 
 if __name__ == "__main__":
-    # Local development only.
     app.run(
         host="127.0.0.1",
-        port=5000,
+        port=5001,
         debug=True,
     )

@@ -1,310 +1,195 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <title>URL Metadata Extractor</title>
-
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
 <body>
-
   <main>
-
     <!-- Header -->
     <header>
-      <div class="badge">WEB TOOL</div>
-
+      <div class="badge">Advanced Web Tool</div>
       <h1>URL Metadata Extractor</h1>
-
       <p>
-        Analyze any webpage and extract its title, description,
-        Open Graph data, Twitter cards, headings, and links.
+        Analyze any webpage and instantly extract rich metadata, social previews, headings, and detailed link statistics in a beautiful interface.
       </p>
     </header>
 
-
     <!-- URL Form -->
     <form method="post">
-
-      <label for="url">Website URL</label>
-
+      <label for="url">Target Website URL</label>
       <div class="field">
-
         <input type="text" id="url" name="url" value="{{ url_input }}" placeholder="https://example.com"
           autocomplete="url" autofocus required>
-
         <button type="submit">
-          Extract
+          Analyze URL
         </button>
-
       </div>
-
     </form>
-
 
     <!-- Error -->
     {% if error %}
-    <p class="error" role="alert">
+    <div class="error" role="alert">
       {{ error }}
-    </p>
+    </div>
     {% endif %}
-
 
     <!-- Results -->
     {% if metadata %}
-
     <section class="results">
 
       <!-- Notice -->
       {% if metadata.notice %}
-      <p class="notice">
+      <div class="notice">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
         {{ metadata.notice }}
-      </p>
+      </div>
       {% endif %}
-
 
       <!-- Website Summary -->
       <div class="summary">
-
         {% if metadata.favicon %}
-        <img class="favicon" src="{{ metadata.favicon }}" alt="" width="40" height="40">
+        <img class="favicon" src="{{ metadata.favicon }}" alt="Favicon" width="64" height="64">
         {% endif %}
 
         <div class="summary-content">
-
-          <span class="section-label">
-            WEBSITE
-          </span>
-
-          <h2>
-            {{ metadata.title or "No title found" }}
-          </h2>
-
+          <span class="section-label">Target Analysis Complete</span>
+          <h2>{{ metadata.title or "No Title Available" }}</h2>
           <a href="{{ metadata.url }}" target="_blank" rel="noopener noreferrer">
             {{ metadata.url }}
           </a>
-
         </div>
-
       </div>
-
 
       <!-- Basic Metadata -->
       <div class="metadata-section">
-
         <div class="section-heading">
           <span class="section-number">01</span>
-          <h3>Basic Metadata</h3>
+          <h3>Core Metadata</h3>
         </div>
-
         <dl>
-
           <div class="metadata-row">
             <dt>Description</dt>
             <dd>{{ metadata.description or "Not provided" }}</dd>
           </div>
-
           <div class="metadata-row">
             <dt>Domain</dt>
             <dd>{{ metadata.domain }}</dd>
           </div>
-
           <div class="metadata-row">
             <dt>Language</dt>
             <dd>{{ metadata.language or "Not provided" }}</dd>
           </div>
-
           <div class="metadata-row">
             <dt>Author</dt>
             <dd>{{ metadata.author or "Not provided" }}</dd>
           </div>
-
           <div class="metadata-row">
             <dt>Keywords</dt>
             <dd>{{ metadata.keywords or "Not provided" }}</dd>
           </div>
-
           <div class="metadata-row">
-            <dt>Links on page</dt>
-
+            <dt>Link Statistics</dt>
             <dd>
-              {{ metadata.links.total }} total
+              <strong>{{ metadata.links.total }}</strong> Total Links Found
               <span class="link-detail">
-                · {{ metadata.links.internal }} internal
-                · {{ metadata.links.external }} external
+                {{ metadata.links.internal }} Internal &middot; {{ metadata.links.external }} External
               </span>
             </dd>
           </div>
-
         </dl>
-
       </div>
-
 
       <!-- Open Graph -->
       <div class="metadata-section">
-
         <div class="section-heading">
           <span class="section-number">02</span>
-          <h3>Open Graph</h3>
+          <h3>Open Graph Tags</h3>
         </div>
 
         {% if metadata.open_graph %}
-
-        {% if metadata.open_graph.get("og:image") %}
-        <div class="preview-container">
-
-          <span class="preview-label">
-            SOCIAL PREVIEW
-          </span>
-
-          <img class="og-image" src="{{ metadata.open_graph['og:image'] }}" alt="Open Graph preview image"
-            loading="lazy">
-
-        </div>
-        {% endif %}
-
-
-        <dl>
-
-          {% for key, value in metadata.open_graph.items() %}
-
-          <div class="metadata-row">
-
-            <dt>
-              {{ key }}
-            </dt>
-
-            <dd>
-              {{ value }}
-            </dd>
-
+          {% if metadata.open_graph.get("og:image") %}
+          <div class="preview-container">
+            <span class="preview-label">SOCIAL PREVIEW IMAGE</span>
+            <img class="og-image" src="{{ metadata.open_graph['og:image'] }}" alt="Open Graph preview image" loading="lazy">
           </div>
+          {% endif %}
 
-          {% endfor %}
-
-        </dl>
-
+          <dl>
+            {% for key, value in metadata.open_graph.items() %}
+            <div class="metadata-row">
+              <dt>{{ key }}</dt>
+              <dd>{{ value }}</dd>
+            </div>
+            {% endfor %}
+          </dl>
         {% else %}
-
-        <p class="muted">
-          This page has no Open Graph tags.
-        </p>
-
+          <p class="muted">This page has no Open Graph tags configured.</p>
         {% endif %}
-
       </div>
-
 
       <!-- Twitter Card -->
       <div class="metadata-section">
-
         <div class="section-heading">
           <span class="section-number">03</span>
-          <h3>Twitter Card</h3>
+          <h3>Twitter Cards</h3>
         </div>
 
         {% if metadata.twitter %}
-
-        <dl>
-
-          {% for key, value in metadata.twitter.items() %}
-
-          <div class="metadata-row">
-
-            <dt>
-              {{ key }}
-            </dt>
-
-            <dd>
-              {{ value }}
-            </dd>
-
-          </div>
-
-          {% endfor %}
-
-        </dl>
-
+          <dl>
+            {% for key, value in metadata.twitter.items() %}
+            <div class="metadata-row">
+              <dt>{{ key }}</dt>
+              <dd>{{ value }}</dd>
+            </div>
+            {% endfor %}
+          </dl>
         {% else %}
-
-        <p class="muted">
-          This page has no Twitter card tags.
-        </p>
-
+          <p class="muted">This page has no Twitter card tags configured.</p>
         {% endif %}
-
       </div>
-
 
       <!-- Headings -->
       <div class="metadata-section">
-
         <div class="section-heading">
           <span class="section-number">04</span>
-          <h3>Page Headings</h3>
+          <h3>Page Structure</h3>
         </div>
 
         {% if metadata.headings.h1 or metadata.headings.h2 %}
-
-        <ul class="heading-list">
-
-          {% for text in metadata.headings.h1 %}
-
-          <li>
-            <strong>H1</strong>
-            <span>{{ text }}</span>
-          </li>
-
-          {% endfor %}
-
-
-          {% for text in metadata.headings.h2 %}
-
-          <li>
-            <strong>H2</strong>
-            <span>{{ text }}</span>
-          </li>
-
-          {% endfor %}
-
-        </ul>
-
+          <ul class="heading-list">
+            {% for text in metadata.headings.h1 %}
+            <li>
+              <strong>H1</strong>
+              <span>{{ text }}</span>
+            </li>
+            {% endfor %}
+            {% for text in metadata.headings.h2 %}
+            <li>
+              <strong>H2</strong>
+              <span>{{ text }}</span>
+            </li>
+            {% endfor %}
+          </ul>
         {% else %}
-
-        <p class="muted">
-          No H1 or H2 headings found.
-        </p>
-
+          <p class="muted">No H1 or H2 headings found.</p>
         {% endif %}
-
       </div>
-
 
       <!-- Footer -->
       <div class="results-footer">
-
-        <span>
-          Metadata extraction complete
-        </span>
-
-        <span class="status">
-          ● READY
-        </span>
-
+        <span>Analysis successfully executed</span>
+        <span class="status">READY</span>
       </div>
 
     </section>
-
     {% endif %}
 
   </main>
-
 </body>
 
 </html>
