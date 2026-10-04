@@ -47,7 +47,7 @@ url-metadata-extractor/
    ```bash
    python app.py
    ```
-   Open [http://localhost:5000](http://localhost:5000) or [http://127.0.0.1:5000](http://127.0.0.1:5000) in your web browser.
+   Open https://vercel.com/ayansinnghs-projects/url_metadata_extractor in your web browser.
 
 ## Features & What It Extracts
 - **Title & Description:** Automatically prioritizes standard tags with fallback to Open Graph and Twitter Card tags.
